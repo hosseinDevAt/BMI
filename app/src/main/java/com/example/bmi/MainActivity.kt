@@ -1,56 +1,55 @@
 package com.example.bmi
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bmi.ui.theme.BMITheme
-import kotlin.properties.Delegates
 
 class MainActivity : ComponentActivity() {
     var stateHeight = mutableStateOf("")
     var stateWeight = mutableStateOf("")
-    var res = mutableStateOf("مقادیر را وارد نمایید")
-    var classif = mutableStateOf("")
+    var res = mutableStateOf("please fill that fields")
+    var resColor = mutableStateOf(Color.Transparent)
+    var classIf = mutableStateOf("")
+    var src = mutableStateOf<String?>(null)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -80,19 +79,38 @@ class MainActivity : ComponentActivity() {
                 text = res.value,
                 modifier = Modifier
                     .fillMaxWidth(),
-                fontSize = 46.sp,
+                fontSize = 36.sp,
                 textAlign = TextAlign.Center
             )
 
             Spacer(Modifier.height(45.dp))
 
-            Text(
-                text = classif.value,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                fontSize = 36.sp,
-                textAlign = TextAlign.Center
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+                Text(
+                    text = classIf.value,
+                    fontSize = 38.sp,
+                    textAlign = TextAlign.Center,
+                    color = resColor.value
+                )
+
+                Spacer(Modifier.width(10.dp))
+
+                val currentIcon = src.value
+                if (!currentIcon.isNullOrBlank()) {
+                    Image(
+                        painter = painterResource(id = currentIcon.toInt()),
+                        contentDescription = "",
+                        modifier = Modifier.size(45.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+            }
 
 
             Card()
@@ -129,6 +147,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     @Composable
     private fun Form() {
 
@@ -213,19 +232,40 @@ class MainActivity : ComponentActivity() {
                         val heightM = heightCM / 100.0
                         val bmiResult = weightKg / ((heightM * heightM))
                         val bmi2Decimal = String.format("%.2f", bmiResult)
-                        res.value = " $bmi2Decimal "
+                        res.value = " your bmi is : $bmi2Decimal "
+                        val newColor : Color
+                        val text : String
+                        val icon : Int
 
-                        val classification = when{
-                            bmiResult < 18.5 -> " لاغری "
-                            bmiResult < 24.9 -> " سالم "
-                            bmiResult < 29.9 -> " اضافه وزن "
-                            else -> " چاقی "
+                            when{
+                            bmiResult < 18.5 -> {
+                                text = " Slimming "
+                                newColor = Color(0XFF11c8d9)
+                                icon = R.drawable.slimming
+                            }
+                            bmiResult < 24.9 -> {
+                                text = " Healthy "
+                                newColor = Color(0XFF04b825)
+                                icon = R.drawable.healthy
+                            }
+                            bmiResult < 29.9 -> {
+                                text = " Overweight "
+                                newColor = Color(0XFFb38300)
+                                icon = R.drawable.overweight
+                            }
+                            else -> {
+                                text = " Obesity "
+                                newColor = Color(0XFFa10e03)
+                                icon = R.drawable.obesity
+                            }
                         }
 
-                        classif.value += classification
+                        classIf.value = text
+                        resColor.value = newColor
+                        src.value = icon.toString()
 
                     }else{
-                        res.value = "مقادیر ورودی نا معتبر است"
+                        res.value = "wrong values for this fields"
                     }
 
                 },
